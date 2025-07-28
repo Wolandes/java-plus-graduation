@@ -66,7 +66,9 @@ public interface EventMapper {
      * @return коллекция трансферных объектов, содержащих краткую информацию о событиях.
      */
     Collection<EventShortDto> toEventShortDtoCollection(Collection<Event> events);
+}
 
+    /*
     @Named("getEventViews")
     static int getEventViews(Long eventId) {
         StatsClient statsClient = new StatsClient();
@@ -79,5 +81,4 @@ public interface EventMapper {
         } catch (Throwable ex) {
             return 0;
         }
-    }
-}
+    }*/
