@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import ewm.category.Category;
 import ewm.category.CategoryRepository;
+import ewm.client.StatsClient;
 import ewm.exception.CreateEntityException;
 import ewm.exception.ForbiddenException;
 import ewm.exception.NotFoundException;
@@ -42,6 +43,8 @@ public class EventServiceImpl implements EventService {
      * Хранилище данных для сущности "Пользователь".
      */
     private final UserRepository userRepository;
+
+    private final StatsClient statsClient;
 
     /**
      * Добавить новое событие.
@@ -167,14 +170,19 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto getEventById(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
-            throw new ForbiddenException(String.format("Доступ к событию с id = %d запрещён", eventId));
+            throw new ForbiddenException("Нет доступа к событию");
         }
 
-        return EventMapper.INSTANCE.toEventDto(event);
+        EventDto dto = EventMapper.INSTANCE.toEventDto(event);
+        dto.setViews(getViews(event.getId()));
+        return dto;
     }
 
     /**
@@ -336,5 +344,19 @@ public class EventServiceImpl implements EventService {
         }
 
         return EventMapper.INSTANCE.toEventDto(eventRepository.save(event));
+    }
+
+    private int getViews(Long eventId) {
+        try {
+            var response = statsClient.getStats(
+                    LocalDateTime.of(2020, 1, 1, 0, 0),
+                    LocalDateTime.of(2035, 1, 1, 0, 0),
+                    List.of("/events/" + eventId),
+                    true
+            );
+            return response.getBody() != null ? response.getBody().size() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }
