@@ -80,6 +80,7 @@ public class StatsClient {
 
     private URI makeUri(String path) {
         ServiceInstance instance = retryTemplate.execute(context -> getInstance(statsServiceId));
+
         return URI.create("http://" + instance.getHost() + ":" + instance.getPort() + path);
     }
 
