@@ -3,11 +3,11 @@ services:
     image: postgres:16.1
     container_name: main-service-db
     ports:
-      - "6555:5432"
+      - "6543:5432"
     environment:
       - POSTGRES_DB=main-service
-      - POSTGRES_USER=dbuser
-      - POSTGRES_PASSWORD=1qaz!QAZ
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
@@ -18,11 +18,11 @@ services:
     image: postgres:16.1
     container_name: stats-server-db
     ports:
-      - "6556:5432"
+      - "6542:5432"
     environment:
       - POSTGRES_DB=stats-server
-      - POSTGRES_USER=dbuser
-      - POSTGRES_PASSWORD=1qaz!QAZ
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
