@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+
 import ewm.event.QEvent;
 
 
@@ -59,8 +60,8 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto createEvent(Long userId, CreateEventDto createEventDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
-        Category category = categoryRepository.findById(createEventDto.getCategory()).orElseThrow(() -> new NotFoundException(String.format("Категория с id = %d не найдена", createEventDto.getCategory())));
+        User user = findUser(userId);
+        Category category = findCategory(createEventDto.getCategory());
 
         if (createEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new CreateEntityException("Дата и время события должна быть больше текущих даты и времени не менее, чем на 2 часа");
@@ -84,7 +85,7 @@ public class EventServiceImpl implements EventService {
      * @return коллекция событий.
      */
     public Collection<EventDto> getEvents(Long userId, int from, int size) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+        findUser(userId);
 
         Predicate predicate = ewm.event.QEvent.event.initiator.id.eq(userId);
         PageOffset pageOffset = PageOffset.of(from, size, Sort.by("id").ascending());
@@ -183,8 +184,8 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto getEventById(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
+        User user = findUser(userId);
+        Event event = findEvent(eventId);
 
         if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new ForbiddenException(String.format("Доступ к событию с id = %d запрещён", eventId));
@@ -202,7 +203,7 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto getPublishedEventById(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
+        Event event = findEvent(eventId);
 
         if (!Objects.equals(event.getState(), EventState.PUBLISHED)) {
             throw new NotFoundException(String.format("Событие с id = %d не найдено", eventId));
@@ -222,8 +223,8 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto updateEventByUser(Long userId, Long eventId, UpdateEventDto updateEventDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
+        User user = findUser(userId);
+        Event event = findEvent(eventId);
 
         if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new ForbiddenException(String.format("Доступ к событию с id = %d запрещён", eventId));
@@ -253,7 +254,7 @@ public class EventServiceImpl implements EventService {
         }
 
         if (updateEventDto.getCategory() != null) {
-            Category category = categoryRepository.findById(updateEventDto.getCategory()).orElseThrow(() -> new NotFoundException(String.format("Категория с id = %d не найдена", updateEventDto.getCategory())));
+            Category category = findCategory(updateEventDto.getCategory());
             event.setCategory(category);
         }
 
@@ -298,7 +299,7 @@ public class EventServiceImpl implements EventService {
      * @return трансферный объект, содержащий данные о событии.
      */
     public EventDto updateEventByAdmin(Long eventId, UpdateEventDto updateEventDto) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
+        Event event = findEvent(eventId);
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
             throw new ForbiddenException("Нельзя редактировать событие, до наступления которого осталось меньше часа");
         }
@@ -323,7 +324,7 @@ public class EventServiceImpl implements EventService {
         }
 
         if (updateEventDto.getCategory() != null) {
-            Category category = categoryRepository.findById(updateEventDto.getCategory()).orElseThrow(() -> new NotFoundException(String.format("Категория с id = %d не найдена", updateEventDto.getCategory())));
+            Category category = findCategory(updateEventDto.getCategory());
             event.setCategory(category);
         }
 
@@ -371,5 +372,17 @@ public class EventServiceImpl implements EventService {
         } catch (Throwable ex) {
             return 0;
         }
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+    }
+
+    private Category findCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(String.format("Категория с id = %d не найдена", categoryId)));
+    }
+
+    private Event findEvent(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format("Событие с id = %d не найдено", eventId)));
     }
 }
