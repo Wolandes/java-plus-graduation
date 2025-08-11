@@ -1,0 +1,54 @@
+package ru.practicum.event.controller;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.event.model.EventSearch;
+import ru.practicum.event.service.EventService;
+import ru.practicum.api.dto.event.EventDto;
+import ru.practicum.api.dto.event.EventState;
+import ru.practicum.api.dto.event.UpdateEventDto;
+import ru.practicum.api.exception.category.CategoryNotFoundException;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+
+@RequestMapping("/admin/events")
+@RequiredArgsConstructor
+@RestController
+@Slf4j
+public class AdminEventController {
+    private final EventService eventService;
+
+    @GetMapping
+    public Collection<EventDto> getEvents(@RequestParam(required = false) Collection<Long> users,
+                                          @RequestParam(required = false) Collection<EventState> states,
+                                          @RequestParam(required = false) Collection<Long> categories,
+                                          @RequestParam(required = false) String rangeStart,
+                                          @RequestParam(required = false) String rangeEnd,
+                                          @RequestParam(defaultValue = "0") int from,
+                                          @RequestParam(defaultValue = "10") int size) {
+        EventSearch eventSearch = EventSearch.builder()
+                .users(users)
+                .states(states)
+                .categories(categories)
+                .rangeStart(rangeStart != null ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .rangeEnd(rangeEnd != null ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .from(from)
+                .size(size)
+                .build();
+
+        log.info("Get events with params {}", eventSearch);
+        return eventService.getEvents(eventSearch);
+    }
+
+    @PatchMapping("/{eventId}")
+    public EventDto updateEvent(@PathVariable @Positive Long eventId,
+                                @RequestBody @Valid UpdateEventDto updateEventDto) {
+        log.info("Update event {} with id={}", updateEventDto, eventId);
+        return eventService.updateEvent(eventId, updateEventDto);
+    }
+}
