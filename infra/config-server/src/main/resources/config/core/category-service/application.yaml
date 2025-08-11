@@ -7,7 +7,7 @@ spring:
   dataSource:
     driverClassName: org.postgresql.Driver
     password: sa
-    url: jdbc:postgresql://localhost:6543/category-service
+    url: jdbc:postgresql://localhost:6550/category-service
     username: sa
   jpa:
     hibernate:
