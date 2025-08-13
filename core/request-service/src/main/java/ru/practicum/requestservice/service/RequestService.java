@@ -1,15 +1,15 @@
 package ru.practicum.requestservice.service;
 
-import ru.practicum.interactionapi.dto.requestservice.RequestDto;
-import ru.practicum.interactionapi.dto.requestservice.RequestsStatusDto;
-import ru.practicum.interactionapi.dto.requestservice.UpdateEventRequestsStatusDto;
-import ru.practicum.interactionapi.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
-import ru.practicum.interactionapi.exception.requestservice.CancelRequestException;
-import ru.practicum.interactionapi.exception.requestservice.CreateRequestException;
-import ru.practicum.interactionapi.exception.requestservice.RequestNotFoundException;
-import ru.practicum.interactionapi.exception.requestservice.UpdateRequestStatusException;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
+import ru.practicum.api.dto.requestservice.RequestDto;
+import ru.practicum.api.dto.requestservice.RequestsStatusDto;
+import ru.practicum.api.dto.requestservice.UpdateEventRequestsStatusDto;
+import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.exception.requestservice.CancelRequestException;
+import ru.practicum.api.exception.requestservice.CreateRequestException;
+import ru.practicum.api.exception.requestservice.RequestNotFoundException;
+import ru.practicum.api.exception.requestservice.UpdateRequestStatusException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 import java.util.Collection;
 

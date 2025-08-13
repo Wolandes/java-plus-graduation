@@ -1,7 +1,7 @@
 package ru.practicum.requestservice.mapper.converter;
 
 import jakarta.persistence.AttributeConverter;
-import ru.practicum.interactionapi.dto.requestservice.RequestStatus;
+import ru.practicum.api.dto.requestservice.RequestStatus;
 
 public class RequestStatusConverter implements AttributeConverter<RequestStatus, String> {
     @Override

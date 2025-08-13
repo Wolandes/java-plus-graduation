@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.interactionapi.dto.userservice.CreateUserDto;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
-import ru.practicum.interactionapi.exception.userservice.UserWithSameEmailAlreadyExistsException;
+import ru.practicum.api.dto.userservice.CreateUserDto;
+import ru.practicum.api.dto.userservice.UserDto;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
+import ru.practicum.api.exception.userservice.UserWithSameEmailAlreadyExistsException;
 import ru.practicum.userservice.service.UserService;
 
 import java.util.Collection;

@@ -8,11 +8,11 @@ import ru.practicum.compilationservice.model.Compilation;
 import ru.practicum.compilationservice.model.QCompilation;
 import ru.practicum.compilationservice.repository.CompilationRepository;
 import ru.practicum.compilationservice.mapper.CompilationMapper;
-import ru.practicum.interactionapi.dto.compilationservice.CompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.CreateCompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.UpdateCompilationDto;
-import ru.practicum.interactionapi.exception.compilationservice.CompilationNotFoundException;
-import ru.practicum.interactionapi.pageable.PageOffset;
+import ru.practicum.api.dto.compilationservice.CompilationDto;
+import ru.practicum.api.dto.compilationservice.CreateCompilationDto;
+import ru.practicum.api.dto.compilationservice.UpdateCompilationDto;
+import ru.practicum.api.exception.compilationservice.CompilationNotFoundException;
+import ru.practicum.api.pageable.PageOffset;
 
 import java.util.Collection;
 

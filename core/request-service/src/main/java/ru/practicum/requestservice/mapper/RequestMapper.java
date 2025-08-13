@@ -1,7 +1,7 @@
 package ru.practicum.requestservice.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.interactionapi.dto.requestservice.RequestDto;
+import ru.practicum.api.dto.requestservice.RequestDto;
 import ru.practicum.requestservice.model.Request;
 
 import java.util.Collection;

@@ -1,10 +1,10 @@
 package ru.practicum.categoryservice.service;
 
-import ru.practicum.interactionapi.dto.categoryservice.CategoryDto;
-import ru.practicum.interactionapi.dto.categoryservice.CreateCategoryDto;
-import ru.practicum.interactionapi.dto.categoryservice.UpdateCategoryDto;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryWithSameNameAlreadyExistsException;
+import ru.practicum.api.dto.categoryservice.CategoryDto;
+import ru.practicum.api.dto.categoryservice.CreateCategoryDto;
+import ru.practicum.api.dto.categoryservice.UpdateCategoryDto;
+import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
+import ru.practicum.api.exception.categoryservice.CategoryWithSameNameAlreadyExistsException;
 
 import java.util.Collection;
 

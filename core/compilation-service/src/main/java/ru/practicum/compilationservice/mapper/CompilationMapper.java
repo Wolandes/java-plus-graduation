@@ -3,9 +3,9 @@ package ru.practicum.compilationservice.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.compilationservice.model.Compilation;
-import ru.practicum.interactionapi.dto.compilationservice.CompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.CreateCompilationDto;
-import ru.practicum.interactionapi.openfeign.EventServiceClient;
+import ru.practicum.api.dto.compilationservice.CompilationDto;
+import ru.practicum.api.dto.compilationservice.CreateCompilationDto;
+import ru.practicum.api.openfeign.EventServiceClient;
 
 import java.util.Collection;
 

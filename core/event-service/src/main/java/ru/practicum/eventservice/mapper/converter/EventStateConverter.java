@@ -1,7 +1,7 @@
 package ru.practicum.eventservice.mapper.converter;
 
 import jakarta.persistence.AttributeConverter;
-import ru.practicum.interactionapi.dto.eventservice.EventState;
+import ru.practicum.api.dto.eventservice.EventState;
 
 public class EventStateConverter  implements AttributeConverter<EventState, String> {
     @Override

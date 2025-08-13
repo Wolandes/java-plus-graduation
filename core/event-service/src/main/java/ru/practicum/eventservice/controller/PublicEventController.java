@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.eventservice.model.EventSearch;
 import ru.practicum.eventservice.service.EventService;
-import ru.practicum.interactionapi.dto.eventservice.EventDto;
-import ru.practicum.interactionapi.dto.eventservice.EventShortDto;
-import ru.practicum.interactionapi.dto.eventservice.EventSort;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.dto.eventservice.EventDto;
+import ru.practicum.api.dto.eventservice.EventShortDto;
+import ru.practicum.api.dto.eventservice.EventSort;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

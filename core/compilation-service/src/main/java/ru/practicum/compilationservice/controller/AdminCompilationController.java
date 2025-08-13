@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilationservice.service.CompilationService;
-import ru.practicum.interactionapi.dto.compilationservice.CompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.CreateCompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.UpdateCompilationDto;
-import ru.practicum.interactionapi.exception.compilationservice.CompilationNotFoundException;
+import ru.practicum.api.dto.compilationservice.CompilationDto;
+import ru.practicum.api.dto.compilationservice.CreateCompilationDto;
+import ru.practicum.api.dto.compilationservice.UpdateCompilationDto;
+import ru.practicum.api.exception.compilationservice.CompilationNotFoundException;
 
 @RequestMapping("/admin/compilations")
 @RequiredArgsConstructor

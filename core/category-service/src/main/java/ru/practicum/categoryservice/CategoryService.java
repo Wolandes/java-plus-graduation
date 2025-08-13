@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "ru.practicum.interactionapi.openfeign")
+@EnableFeignClients(basePackages = "ru.practicum.api.openfeign")
 @SpringBootApplication
 public class CategoryService {
     public static void main(String[] args) {

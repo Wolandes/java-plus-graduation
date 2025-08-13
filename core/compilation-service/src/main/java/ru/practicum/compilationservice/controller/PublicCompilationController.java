@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilationservice.service.CompilationService;
-import ru.practicum.interactionapi.dto.compilationservice.CompilationDto;
-import ru.practicum.interactionapi.exception.compilationservice.CompilationNotFoundException;
+import ru.practicum.api.dto.compilationservice.CompilationDto;
+import ru.practicum.api.exception.compilationservice.CompilationNotFoundException;
 
 import java.util.Collection;
 

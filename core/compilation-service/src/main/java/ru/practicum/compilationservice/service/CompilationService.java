@@ -1,9 +1,9 @@
 package ru.practicum.compilationservice.service;
 
-import ru.practicum.interactionapi.dto.compilationservice.CompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.CreateCompilationDto;
-import ru.practicum.interactionapi.dto.compilationservice.UpdateCompilationDto;
-import ru.practicum.interactionapi.exception.compilationservice.CompilationNotFoundException;
+import ru.practicum.api.dto.compilationservice.CompilationDto;
+import ru.practicum.api.dto.compilationservice.CreateCompilationDto;
+import ru.practicum.api.dto.compilationservice.UpdateCompilationDto;
+import ru.practicum.api.exception.compilationservice.CompilationNotFoundException;
 
 import java.util.Collection;
 

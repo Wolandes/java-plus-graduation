@@ -4,12 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.interactionapi.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.interactionapi.exception.eventservice.EventEditingException;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
-import ru.practicum.interactionapi.exception.eventservice.InvalidEventDateException;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
+import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
+import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
+import ru.practicum.api.exception.eventservice.EventEditingException;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.exception.eventservice.InvalidEventDateException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 /**
  * Обработчик исключений, возникающих в сервисе.

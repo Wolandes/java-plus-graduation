@@ -1,9 +1,9 @@
 package ru.practicum.userservice.service;
 
-import ru.practicum.interactionapi.dto.userservice.CreateUserDto;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
-import ru.practicum.interactionapi.exception.userservice.UserWithSameEmailAlreadyExistsException;
+import ru.practicum.api.dto.userservice.CreateUserDto;
+import ru.practicum.api.dto.userservice.UserDto;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
+import ru.practicum.api.exception.userservice.UserWithSameEmailAlreadyExistsException;
 
 import java.util.Collection;
 

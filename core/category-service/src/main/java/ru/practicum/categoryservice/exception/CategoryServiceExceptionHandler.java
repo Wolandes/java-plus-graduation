@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryWithSameNameAlreadyExistsException;
-import ru.practicum.interactionapi.exception.categoryservice.DeleteCategoryException;
+import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
+import ru.practicum.api.exception.categoryservice.CategoryWithSameNameAlreadyExistsException;
+import ru.practicum.api.exception.categoryservice.DeleteCategoryException;
 
 @RestControllerAdvice
 public class CategoryServiceExceptionHandler {

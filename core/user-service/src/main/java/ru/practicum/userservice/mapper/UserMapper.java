@@ -1,8 +1,8 @@
 package ru.practicum.userservice.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.interactionapi.dto.userservice.CreateUserDto;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
+import ru.practicum.api.dto.userservice.CreateUserDto;
+import ru.practicum.api.dto.userservice.UserDto;
 import ru.practicum.userservice.model.User;
 
 import java.util.Collection;

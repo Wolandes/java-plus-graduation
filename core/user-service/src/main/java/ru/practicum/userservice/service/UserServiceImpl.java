@@ -2,11 +2,11 @@ package ru.practicum.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.interactionapi.dto.userservice.CreateUserDto;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
-import ru.practicum.interactionapi.exception.userservice.UserWithSameEmailAlreadyExistsException;
-import ru.practicum.interactionapi.pageable.PageOffset;
+import ru.practicum.api.dto.userservice.CreateUserDto;
+import ru.practicum.api.dto.userservice.UserDto;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
+import ru.practicum.api.exception.userservice.UserWithSameEmailAlreadyExistsException;
+import ru.practicum.api.pageable.PageOffset;
 import ru.practicum.userservice.repository.UserRepository;
 import ru.practicum.userservice.mapper.UserMapper;
 

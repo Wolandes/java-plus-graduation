@@ -8,15 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.eventservice.service.EventService;
-import ru.practicum.interactionapi.dto.eventservice.CreateEventDto;
-import ru.practicum.interactionapi.dto.eventservice.EventDto;
-import ru.practicum.interactionapi.dto.eventservice.UpdateEventDto;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.interactionapi.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.interactionapi.exception.eventservice.EventEditingException;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
-import ru.practicum.interactionapi.exception.eventservice.InvalidEventDateException;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
+import ru.practicum.api.dto.eventservice.CreateEventDto;
+import ru.practicum.api.dto.eventservice.EventDto;
+import ru.practicum.api.dto.eventservice.UpdateEventDto;
+import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
+import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
+import ru.practicum.api.exception.eventservice.EventEditingException;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.exception.eventservice.InvalidEventDateException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 import java.util.Collection;
 

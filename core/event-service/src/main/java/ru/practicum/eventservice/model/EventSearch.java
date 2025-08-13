@@ -2,8 +2,8 @@ package ru.practicum.eventservice.model;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.interactionapi.dto.eventservice.EventSort;
-import ru.practicum.interactionapi.dto.eventservice.EventState;
+import ru.practicum.api.dto.eventservice.EventSort;
+import ru.practicum.api.dto.eventservice.EventState;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

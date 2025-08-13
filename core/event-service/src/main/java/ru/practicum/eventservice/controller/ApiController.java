@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.eventservice.service.EventService;
-import ru.practicum.interactionapi.dto.eventservice.EventDto;
-import ru.practicum.interactionapi.dto.eventservice.EventShortDto;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.dto.eventservice.EventDto;
+import ru.practicum.api.dto.eventservice.EventShortDto;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
 
 import java.util.Collection;
 

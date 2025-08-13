@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.categoryservice.service.CategoryService;
-import ru.practicum.interactionapi.dto.categoryservice.CategoryDto;
-import ru.practicum.interactionapi.exception.categoryservice.CategoryNotFoundException;
+import ru.practicum.api.dto.categoryservice.CategoryDto;
+import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
 
 import java.util.Collection;
 

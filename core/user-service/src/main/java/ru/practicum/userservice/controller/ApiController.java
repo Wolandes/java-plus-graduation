@@ -4,8 +4,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
+import ru.practicum.api.dto.userservice.UserDto;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 import ru.practicum.userservice.service.UserService;
 
 import java.util.Collection;

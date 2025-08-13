@@ -5,11 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.interactionapi.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.interactionapi.exception.eventservice.EventNotFoundException;
-import ru.practicum.interactionapi.exception.requestservice.CreateRequestException;
-import ru.practicum.interactionapi.exception.requestservice.UpdateRequestStatusException;
-import ru.practicum.interactionapi.exception.userservice.UserNotFoundException;
+import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
+import ru.practicum.api.exception.eventservice.EventNotFoundException;
+import ru.practicum.api.exception.requestservice.CreateRequestException;
+import ru.practicum.api.exception.requestservice.UpdateRequestStatusException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 @RestControllerAdvice
 public class RequestServiceExceptionHandler {

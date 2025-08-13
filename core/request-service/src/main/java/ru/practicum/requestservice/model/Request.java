@@ -2,7 +2,7 @@ package ru.practicum.requestservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.practicum.interactionapi.dto.requestservice.RequestStatus;
+import ru.practicum.api.dto.requestservice.RequestStatus;
 import ru.practicum.requestservice.mapper.converter.RequestStatusConverter;
 
 import java.time.LocalDateTime;

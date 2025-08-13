@@ -2,8 +2,8 @@ package ru.practicum.categoryservice.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.categoryservice.model.Category;
-import ru.practicum.interactionapi.dto.categoryservice.CategoryDto;
-import ru.practicum.interactionapi.dto.categoryservice.CreateCategoryDto;
+import ru.practicum.api.dto.categoryservice.CategoryDto;
+import ru.practicum.api.dto.categoryservice.CreateCategoryDto;
 
 import java.util.Collection;
 

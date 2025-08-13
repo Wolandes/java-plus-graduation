@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.eventservice.mapper.converter.EventStateConverter;
 import ru.practicum.eventservice.mapper.converter.LocationConverter;
-import ru.practicum.interactionapi.dto.eventservice.EventState;
+import ru.practicum.api.dto.eventservice.EventState;
 
 import java.time.LocalDateTime;
 

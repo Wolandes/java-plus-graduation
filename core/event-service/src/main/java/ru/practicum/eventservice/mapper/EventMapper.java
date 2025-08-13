@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.eventservice.model.Event;
 import ru.practicum.eventservice.model.Location;
-import ru.practicum.interactionapi.dto.categoryservice.CategoryDto;
-import ru.practicum.interactionapi.dto.eventservice.*;
-import ru.practicum.interactionapi.dto.userservice.UserDto;
-import ru.practicum.interactionapi.openfeign.CategoryServiceClient;
-import ru.practicum.interactionapi.openfeign.UserServiceClient;
+import ru.practicum.api.dto.categoryservice.CategoryDto;
+import ru.practicum.api.dto.eventservice.*;
+import ru.practicum.api.dto.userservice.UserDto;
+import ru.practicum.api.openfeign.CategoryServiceClient;
+import ru.practicum.api.openfeign.UserServiceClient;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
