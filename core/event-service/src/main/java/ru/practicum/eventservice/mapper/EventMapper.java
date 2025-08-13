@@ -9,8 +9,8 @@ import ru.practicum.eventservice.model.Location;
 import ru.practicum.api.dto.categoryservice.CategoryDto;
 import ru.practicum.api.dto.eventservice.*;
 import ru.practicum.api.dto.userservice.UserDto;
-import ru.practicum.api.openfeign.CategoryServiceClient;
-import ru.practicum.api.openfeign.UserServiceClient;
+import ru.practicum.api.client.CategoryServiceClient;
+import ru.practicum.api.client.UserServiceClient;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.compilationservice.model.Compilation;
 import ru.practicum.api.dto.compilationservice.CompilationDto;
 import ru.practicum.api.dto.compilationservice.CreateCompilationDto;
-import ru.practicum.api.openfeign.EventServiceClient;
+import ru.practicum.api.client.EventServiceClient;
 
 import java.util.Collection;
 

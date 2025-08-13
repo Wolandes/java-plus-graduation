@@ -22,8 +22,8 @@ import ru.practicum.api.exception.eventservice.EventEditingException;
 import ru.practicum.api.exception.eventservice.EventNotFoundException;
 import ru.practicum.api.exception.eventservice.InvalidEventDateException;
 import ru.practicum.api.exception.userservice.UserNotFoundException;
-import ru.practicum.api.openfeign.CategoryServiceClient;
-import ru.practicum.api.openfeign.UserServiceClient;
+import ru.practicum.api.client.CategoryServiceClient;
+import ru.practicum.api.client.UserServiceClient;
 import ru.practicum.api.pageable.PageOffset;
 
 import java.time.LocalDateTime;

@@ -12,7 +12,7 @@ import ru.practicum.api.dto.categoryservice.UpdateCategoryDto;
 import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
 import ru.practicum.api.exception.categoryservice.CategoryWithSameNameAlreadyExistsException;
 import ru.practicum.api.exception.categoryservice.DeleteCategoryException;
-import ru.practicum.api.openfeign.EventServiceClient;
+import ru.practicum.api.client.EventServiceClient;
 import ru.practicum.api.pageable.PageOffset;
 
 import java.util.Collection;
