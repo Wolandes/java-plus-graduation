@@ -12,7 +12,7 @@ spring:
       retry:
         max-interval: 45000
         useRandomPolicy: true
-
+        
 eureka:
   client:
     registry-fetch-interval-seconds: 5

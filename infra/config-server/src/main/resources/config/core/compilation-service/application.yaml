@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: compilation-service
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
   dataSource:
     driverClassName: org.postgresql.Driver
     password: sa
