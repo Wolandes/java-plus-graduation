@@ -1,0 +1,90 @@
+services:
+  category-service-db:
+    image: postgres:16.1
+    container_name: category-service-db
+    ports:
+      - "6550:5432"
+    environment:
+      - POSTGRES_DB=category-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  compilation-service-db:
+    image: postgres:16.1
+    container_name: compilation-service-db
+    ports:
+      - "6551:5432"
+    environment:
+      - POSTGRES_DB=compilation-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  event-service-db:
+    image: postgres:16.1
+    container_name: event-service-db
+    ports:
+      - "6552:5432"
+    environment:
+      - POSTGRES_DB=event-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  request-service-db:
+    image: postgres:16.1
+    container_name: request-service-db
+    ports:
+      - "6553:5432"
+    environment:
+      - POSTGRES_DB=request-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  stats-server-db:
+    image: postgres:16.1
+    container_name: stats-server-db
+    ports:
+      - "6554:5432"
+    environment:
+      - POSTGRES_DB=stats-server
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  user-service-db:
+    image: postgres:16.1
+    container_name: user-service-db
+    ports:
+      - "6555:5432"
+    environment:
+      - POSTGRES_DB=user-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
