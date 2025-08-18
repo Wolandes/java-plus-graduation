@@ -6,7 +6,7 @@ eureka:
 
 spring:
   application:
-    name: stats-server
+    name: aggregator
   config:
     import: "configserver:"
   cloud:
