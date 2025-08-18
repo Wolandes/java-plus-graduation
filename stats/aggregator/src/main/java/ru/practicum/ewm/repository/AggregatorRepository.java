@@ -31,7 +31,7 @@ public class AggregatorRepository {
         long eventId = userAction.getEventId();
 
         double oldWeight = userActionsWeight.computeIfAbsent(eventId, e -> new HashMap<>()).getOrDefault(userId, 0.0);
-        double newWeight = getUserActionWeight(userAction.getActionType()); // определим новый вес действия пользователя с мероприятием
+        double newWeight = getUserActionWeight(userAction.getActionType());
 
         if (oldWeight >= newWeight) {
             return List.of();
