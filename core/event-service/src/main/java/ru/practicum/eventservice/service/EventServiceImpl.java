@@ -2,7 +2,7 @@ package ru.practicum.eventservice.service;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import ewm.client.StatsClient;
+import ewm.client.AnalyzerClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,10 +27,8 @@ import ru.practicum.api.client.UserServiceClient;
 import ru.practicum.api.pageable.PageOffset;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -41,9 +39,10 @@ public class EventServiceImpl implements EventService {
 
     private final CategoryServiceClient categoryServiceClient;
 
-    private final StatsClient statsClient;
-
     private final UserServiceClient userServiceClient;
+
+    private final AnalyzerClient analyzerClient;
+
 
     @Override
     public EventDto createEvent(Long initiatorId, CreateEventDto createEventDto) throws InvalidEventDateException {
@@ -64,7 +63,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventMapper.mapToEvent(createEventDto, initiator.getId(), category.getId());
         eventRepository.save(event);
 
-        return eventMapper.mapToEventDto(event, initiator, category, 0L);
+        return eventMapper.mapToEventDto(event, initiator, category);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class EventServiceImpl implements EventService {
             throw new AccessToEventForbiddenException(eventId);
         }
 
-        return eventMapper.mapToEventDto(event, userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(event.getId()));
+        return eventMapper.mapToEventDto(event, userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -115,7 +114,7 @@ public class EventServiceImpl implements EventService {
             throw new EventNotFoundException(eventId);
         }
 
-        return eventMapper.mapToEventDto(event, userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(event.getId()));
+        return eventMapper.mapToEventDto(event, userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -184,7 +183,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(eventId));
+        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -255,7 +254,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(eventId));
+        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -339,17 +338,6 @@ public class EventServiceImpl implements EventService {
         List<Event> result = new ArrayList<>();
         eventRepository.findAll(predicate, pageable).forEach(result::add);
         return result;
-    }
-
-    private Long getEventStats(long eventId) {
-        LocalDateTime start = LocalDateTime.of(2020, 5, 5, 0, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2035, 5, 5, 0, 0, 0);
-
-        try {
-            return Objects.requireNonNull(statsClient.getStats(start, end, List.of("/events/" + eventId), true).getBody()).getFirst().getHits();
-        } catch (Throwable ex) {
-            return 0L;
-        }
     }
 
     private Event findEvent(Long eventId) throws EventNotFoundException {

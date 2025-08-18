@@ -1,7 +1,6 @@
 package ru.practicum.eventservice.controller;
 
-import ewm.CreateEndpointHitDto;
-import ewm.client.StatsClient;
+import ewm.client.CollectorClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ import java.util.Collection;
 public class PublicEventController {
     private final EventService eventService;
 
-    private final StatsClient statsClient;
+    private final CollectorClient collectorClient;
 
     @GetMapping
     public Collection<EventShortDto> getEvents(@RequestParam(required = false) String text,
@@ -38,42 +37,25 @@ public class PublicEventController {
                                                @RequestParam(defaultValue = "0") int from,
                                                @RequestParam(defaultValue = "10") int size,
                                                HttpServletRequest request) {
-        try {
-            EventSearch eventSearch = EventSearch.builder()
-                    .text(text)
-                    .categories(categories)
-                    .paid(paid)
-                    .rangeStart(rangeStart != null ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
-                    .rangeEnd(rangeEnd != null ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
-                    .onlyAvailable(onlyAvailable)
-                    .sort(sort)
-                    .from(from)
-                    .size(size)
-                    .build();
+        EventSearch eventSearch = EventSearch.builder()
+                .text(text)
+                .categories(categories)
+                .paid(paid)
+                .rangeStart(rangeStart != null ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .rangeEnd(rangeEnd != null ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .onlyAvailable(onlyAvailable)
+                .sort(sort)
+                .from(from)
+                .size(size)
+                .build();
 
-            log.info("Get events with params {}", eventSearch);
-            return eventService.getPublishedEvents(eventSearch);
-        } finally {
-            try {
-                statsClient.sendHit(new CreateEndpointHitDto("event-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-            }
-        }
+        log.info("Get events with params {}", eventSearch);
+        return eventService.getPublishedEvents(eventSearch);
     }
 
     @GetMapping("/{eventId}")
     public EventDto getPublishedEventById(@PathVariable @Positive Long eventId, HttpServletRequest request) throws EventNotFoundException {
         log.info("Get published event with id = {}", eventId);
-
-        try {
-            return eventService.getPublishedEventById(eventId);
-        } finally {
-            try {
-                statsClient.sendHit(new CreateEndpointHitDto("event-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-            }
-        }
+        return eventService.getPublishedEventById(eventId);
     }
 }
