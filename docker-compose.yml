@@ -121,7 +121,7 @@ services:
         condition: service_healthy
       event-service-db:
         condition: service_healthy
-      stats-server:
+      analyzer-server:
         condition: service_healthy
       user-service:
         condition: service_healthy
@@ -218,35 +218,73 @@ services:
       interval: 5s
       retries: 10
 
-  stats-server:
-    build: stats/stats-server
-    image: stats-server
-    container_name: stats-server
+  analyzer-server:
+    build: stats/analyzer
+    image: analyzer-server
+    container_name: analyzer-server
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-server-db:5432/stats-server
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://analyzer-server-db:5432/analyzer
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
-      stats-server-db:
+      analyzer-server-db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/stats-server" ]
+      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
       interval: 15s
       timeout: 5s
       retries: 10
       start_period: 20s
     restart: on-failure
 
-  stats-server-db:
-    image: postgres:16.1
-    container_name: stats-server-db
-    ports:
-      - "6554:5432"
+  aggregator-server:
+    build: stats/aggregator
+    image: aggregator-server
+    container_name: aggregator-server
     environment:
-      - POSTGRES_DB=stats-server
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: on-failure
+
+  collector-server:
+    build: stats/collector
+    image: collector-server
+    container_name: collector-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: on-failure
+
+  analyzer-server-db:
+    image: postgres:16.1
+    container_name: analyzer-server-db
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=analyzer
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=sa
     healthcheck:
