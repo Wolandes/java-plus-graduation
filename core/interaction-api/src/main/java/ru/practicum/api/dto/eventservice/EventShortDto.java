@@ -62,5 +62,5 @@ public class EventShortDto {
     /**
      * Рейтинг мероприятия.
      */
-    private long rating;
+    private double rating;
 }

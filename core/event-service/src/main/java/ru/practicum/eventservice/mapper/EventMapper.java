@@ -88,8 +88,12 @@ public class EventMapper {
         Map<Long, CategoryDto> categories = categoryServiceClient.getCategories(categoriesIds)
                 .stream().collect(Collectors.toMap(CategoryDto::getId, category -> category));
 
+        //получим рейтинг мероприятия из сервиса
+        Map<Long, Double> ratingsMap = analyzerClient.getInteractionsCount(events.stream().map(Event::getId).toList());
+
         return events.stream()
                 .map(event -> mapToEventDto(event, initiators.get(event.getInitiatorId()), categories.get(event.getCategoryId())))
+                .peek(event -> event.setRating(ratingsMap.getOrDefault(event.getId(), 0.0)))
                 .toList();
     }
 
@@ -113,8 +117,12 @@ public class EventMapper {
         Map<Long, CategoryDto> categories = categoryServiceClient.getCategories(categoriesIds)
                 .stream().collect(Collectors.toMap(CategoryDto::getId, category -> category));
 
+        //получим рейтинг мероприятия из сервиса
+        Map<Long, Double> ratingsMap = analyzerClient.getInteractionsCount(events.stream().map(Event::getId).toList());
+
         return events.stream()
                 .map(event -> mapToEventShortDto(event, initiators.get(event.getInitiatorId()), categories.get(event.getCategoryId())))
+                .peek(event -> event.setRating(ratingsMap.getOrDefault(event.getId(), 0.0)))
                 .toList();
     }
 

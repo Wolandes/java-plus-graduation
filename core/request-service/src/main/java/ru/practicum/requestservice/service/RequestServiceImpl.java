@@ -23,6 +23,8 @@ import ru.practicum.requestservice.mapper.RequestMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -173,5 +175,17 @@ public class RequestServiceImpl implements RequestService {
 
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.mapToRequestDto(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestDto findByRequesterIdAndEventId(Long requesterId, Long eventId) throws CreateRequestException {
+        Optional<Request> requestOptional = requestRepository.findByRequesterIdAndEventId(requesterId, eventId);
+        Request request = requestOptional.orElseThrow(()-> new CreateRequestException("Нет такого события"));
+        return requestMapper.mapToRequestDto(request);
+    }
+
+    @Override
+    public List<RequestDto> findByEventIdInAndStatus(List<Long> eventIds, RequestStatus requestStatus) {
+        return requestMapper.mapToRequestDtoCollection(requestRepository.findByEventIdInAndStatus(eventIds, requestStatus)).stream().toList();
     }
 }

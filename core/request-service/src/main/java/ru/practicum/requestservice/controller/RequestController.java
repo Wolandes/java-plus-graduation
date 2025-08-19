@@ -1,5 +1,6 @@
 package ru.practicum.requestservice.controller;
 
+import ewm.client.CollectorClient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,16 @@ import java.util.Collection;
 public class RequestController {
     private final RequestService requestService;
 
+    private final CollectorClient collectorClient;
+
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestDto createRequest(@PathVariable(name = "userId") @Positive Long requesterId,
                                     @RequestParam @Positive Long eventId) throws CreateRequestException, EventNotFoundException, UserNotFoundException {
         log.info("Create request for event with id={} by user with id={}", eventId, requesterId);
-        return requestService.createRequest(requesterId, eventId);
+        RequestDto request = requestService.createRequest(requesterId, eventId);
+        collectorClient.sendRegistrationEvent(requesterId, eventId);
+        return request;
     }
 
     @GetMapping("/requests")

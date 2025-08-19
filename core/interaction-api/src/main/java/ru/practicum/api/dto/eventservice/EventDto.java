@@ -99,5 +99,5 @@ public class EventDto {
     /**
      * Рейтинг мероприятия.
      */
-    private long rating;
+    private double rating;
 }

@@ -5,7 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.api.exception.eventservice.UserNotVisitedEventException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 import ru.practicum.eventservice.model.EventSearch;
 import ru.practicum.eventservice.service.EventService;
 import ru.practicum.api.dto.eventservice.EventDto;
@@ -16,6 +19,7 @@ import ru.practicum.api.exception.eventservice.EventNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 
 @RequestMapping("/events")
 @RequiredArgsConstructor
@@ -25,6 +29,8 @@ public class PublicEventController {
     private final EventService eventService;
 
     private final CollectorClient collectorClient;
+
+    private final String USER_ID_HEADER = "X-EWM-USER-ID";
 
     @GetMapping
     public Collection<EventShortDto> getEvents(@RequestParam(required = false) String text,
@@ -54,8 +60,22 @@ public class PublicEventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDto getPublishedEventById(@PathVariable @Positive Long eventId, HttpServletRequest request) throws EventNotFoundException {
+    public EventDto getPublishedEventById(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable(USER_ID_HEADER) @Positive Long eventId, HttpServletRequest request) throws EventNotFoundException {
         log.info("Get published event with id = {}", eventId);
+        collectorClient.sendPreviewEvent(userId, eventId);
         return eventService.getPublishedEventById(eventId);
+    }
+
+    @PutMapping("/{eventId}/like")
+    @ResponseStatus(HttpStatus.OK)
+    public void likeEvent(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable long id) throws EventNotFoundException, UserNotFoundException, UserNotVisitedEventException {
+        eventService.checkUserRegistrationAtEvent(userId, id);
+        collectorClient.sendLikeEvent(userId, id);
+    }
+
+    @GetMapping("/recommendations")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> getRecommendationsForUser(@RequestHeader(USER_ID_HEADER) Long userId, @RequestParam int maxResults) {
+        return eventService.getRecommendationsForUser(userId, maxResults);
     }
 }
