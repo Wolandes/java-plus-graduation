@@ -1,12 +1,14 @@
 package ru.practicum.eventservice.controller;
 
-import ewm.CreateEndpointHitDto;
-import ewm.client.StatsClient;
+import ewm.client.CollectorClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.api.exception.eventservice.UserNotVisitedEventException;
+import ru.practicum.api.exception.userservice.UserNotFoundException;
 import ru.practicum.eventservice.model.EventSearch;
 import ru.practicum.eventservice.service.EventService;
 import ru.practicum.api.dto.eventservice.EventDto;
@@ -17,6 +19,7 @@ import ru.practicum.api.exception.eventservice.EventNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 
 @RequestMapping("/events")
 @RequiredArgsConstructor
@@ -25,7 +28,9 @@ import java.util.Collection;
 public class PublicEventController {
     private final EventService eventService;
 
-    private final StatsClient statsClient;
+    private final CollectorClient collectorClient;
+
+    private final String USER_ID_HEADER = "X-EWM-USER-ID";
 
     @GetMapping
     public Collection<EventShortDto> getEvents(@RequestParam(required = false) String text,
@@ -38,42 +43,41 @@ public class PublicEventController {
                                                @RequestParam(defaultValue = "0") int from,
                                                @RequestParam(defaultValue = "10") int size,
                                                HttpServletRequest request) {
-        try {
-            EventSearch eventSearch = EventSearch.builder()
-                    .text(text)
-                    .categories(categories)
-                    .paid(paid)
-                    .rangeStart(rangeStart != null ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
-                    .rangeEnd(rangeEnd != null ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
-                    .onlyAvailable(onlyAvailable)
-                    .sort(sort)
-                    .from(from)
-                    .size(size)
-                    .build();
+        EventSearch eventSearch = EventSearch.builder()
+                .text(text)
+                .categories(categories)
+                .paid(paid)
+                .rangeStart(rangeStart != null ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .rangeEnd(rangeEnd != null ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null)
+                .onlyAvailable(onlyAvailable)
+                .sort(sort)
+                .from(from)
+                .size(size)
+                .build();
 
-            log.info("Get events with params {}", eventSearch);
-            return eventService.getPublishedEvents(eventSearch);
-        } finally {
-            try {
-                statsClient.sendHit(new CreateEndpointHitDto("event-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-            }
-        }
+        log.info("Get events with params {}", eventSearch);
+        return eventService.getPublishedEvents(eventSearch);
     }
 
     @GetMapping("/{eventId}")
-    public EventDto getPublishedEventById(@PathVariable @Positive Long eventId, HttpServletRequest request) throws EventNotFoundException {
+    public EventDto getPublishedEventById(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable @Positive Long eventId) throws EventNotFoundException {
         log.info("Get published event with id = {}", eventId);
+        collectorClient.sendPreviewEvent(userId, eventId);
+        EventDto eventDto = eventService.getPublishedEventById(eventId);
+        log.info("Создан Event");
+        return eventDto;
+    }
 
-        try {
-            return eventService.getPublishedEventById(eventId);
-        } finally {
-            try {
-                statsClient.sendHit(new CreateEndpointHitDto("event-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-            }
-        }
+    @PutMapping("/{eventId}/like")
+    @ResponseStatus(HttpStatus.OK)
+    public void likeEvent(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable long id) throws EventNotFoundException, UserNotFoundException, UserNotVisitedEventException {
+        eventService.checkUserRegistrationAtEvent(userId, id);
+        collectorClient.sendLikeEvent(userId, id);
+    }
+
+    @GetMapping("/recommendations")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> getRecommendationsForUser(@RequestHeader(USER_ID_HEADER) Long userId, @RequestParam int maxResults) {
+        return eventService.getRecommendationsForUser(userId, maxResults);
     }
 }

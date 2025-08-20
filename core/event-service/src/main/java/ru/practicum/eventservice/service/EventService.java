@@ -1,18 +1,16 @@
 package ru.practicum.eventservice.service;
 
+import ru.practicum.api.exception.eventservice.*;
 import ru.practicum.eventservice.model.EventSearch;
 import ru.practicum.api.dto.eventservice.CreateEventDto;
 import ru.practicum.api.dto.eventservice.EventDto;
 import ru.practicum.api.dto.eventservice.EventShortDto;
 import ru.practicum.api.dto.eventservice.UpdateEventDto;
 import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.api.exception.eventservice.EventEditingException;
-import ru.practicum.api.exception.eventservice.EventNotFoundException;
-import ru.practicum.api.exception.eventservice.InvalidEventDateException;
 import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface EventService {
     EventDto createEvent(Long initiatorId, CreateEventDto createEventDto) throws InvalidEventDateException;
@@ -42,4 +40,8 @@ public interface EventService {
     void confirmParticipation(Long eventId) throws EventNotFoundException;
 
     void rejectParticipation(Long eventId) throws EventNotFoundException;
+
+    void checkUserRegistrationAtEvent(Long userId, Long eventId) throws EventNotFoundException, UserNotFoundException, UserNotVisitedEventException;
+
+    List<EventDto> getRecommendationsForUser(Long userId, Integer maxResult);
 }

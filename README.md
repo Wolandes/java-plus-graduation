@@ -29,9 +29,11 @@
 Модуль содержит информацию о статистике просмотров событий:
 
 1. **stats-client** — обеспечивает взаимодействие с сервисами модуля `core` при помощи использования `RestClient` и
-   `DiscoveryClient` 
+   `DiscoveryClient`
 2. **stats-dto** — модуль для DTO
-3. **stats-server** - содержит логику работы статистики хранение данных и основные методы просмотра статистики
+3. **collector** — сервис для приема сообщений о действиях пользователей, используя gRPC
+4. **aggregator** — сервис для расчета сходства мероприятий
+5. **analyzer** — сервис для обработки запросов по gRPC и выдачи рекомендаций
 
 ## Спецификации внешнего API
 
@@ -45,14 +47,16 @@
 Префиксы внутренних эндпоинтов (роутов): /interaction/{service}
 Взаимосвязь сервисов:
 
-| Сервис              | Используемые сервисы           |
-|---------------------|--------------------------------|
-| category-service    | event-service                  |
-| compilation-service |                                |
-| event-service       | user-service, category-service |
-| request-service     | event-service, user-service    |
-| user-service        | ---                            |
-| stats-service       | ---                            |
+| Сервис              | Используемые сервисы                                      |
+|---------------------|-----------------------------------------------------------|
+| category-service    | event-service                                             |
+| compilation-service | ---                                                       |
+| event-service       | user-service, category-service, request-service, analyzer |
+| request-service     | event-service, user-service, collector                    |
+| user-service        | ---                                                       |
+| analyzer            | ---                                                       |
+| collector           | ---                                                       |
+| aggregator          | ---                                                       |
 
 Описание внутренних API:
 
@@ -77,3 +81,8 @@
 | GET /interaction/users                                | Получить коллекцию пользователей            |
 | GET /interaction/users/{userId}                       | Получить пользователя по его идентификатору |
 | GET /interaction/users/check/existence/by/id/{userId} | Проверить существует ли пользователь        |
+
+| Request API                                          | Описание                                 |
+|------------------------------------------------------|------------------------------------------|
+| GET /interaction/request/find-by-requester-and-event | Получить по инициатору запроса и события |
+| GET /interaction/request/find-by-events              | Получить события                         |

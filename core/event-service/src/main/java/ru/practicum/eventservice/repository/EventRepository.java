@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import ru.practicum.eventservice.model.Event;
 
+import java.util.List;
+
 /**
  * Контракт хранилища данных о событиях
  */
@@ -15,4 +17,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
      * @return признак существуют ли события с данной категорией.
      */
     boolean existsByCategoryId(Long categoryId);
+
+    List<Event> findByIdIn(List<Long> events);
 }

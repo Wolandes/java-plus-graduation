@@ -7,8 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "ru.practicum.api.client")
-@SpringBootApplication
-public class RequestService {
+@SpringBootApplication(scanBasePackages = {"ru.practicum.requestservice", "ewm.client"})public class RequestService {
     public static void main(String[] args) {
         SpringApplication.run(RequestService.class, args);
     }

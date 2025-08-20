@@ -60,7 +60,7 @@ public class EventShortDto {
     private int confirmedRequests;
 
     /**
-     * Количество просмотров события.
+     * Рейтинг мероприятия.
      */
-    private long views;
+    private double rating;
 }

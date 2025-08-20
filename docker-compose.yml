@@ -21,21 +21,6 @@ services:
       start_period: 15s
     restart: on-failure
 
-  category-service-db:
-    image: postgres:16.1
-    container_name: category-service-db
-    ports:
-      - "6550:5432"
-    environment:
-      - POSTGRES_DB=category-service
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=sa
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
-
   compilation-service:
     build: core/compilation-service
     image: compilation-service
@@ -59,21 +44,6 @@ services:
       retries: 10
       start_period: 15s
     restart: on-failure
-
-  compilation-service-db:
-    image: postgres:16.1
-    container_name: compilation-service-db
-    ports:
-      - "6551:5432"
-    environment:
-      - POSTGRES_DB=compilation-service
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=sa
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
 
   config-server:
     build: infra/config-server
@@ -121,7 +91,7 @@ services:
         condition: service_healthy
       event-service-db:
         condition: service_healthy
-      stats-server:
+      analyzer:
         condition: service_healthy
       user-service:
         condition: service_healthy
@@ -132,21 +102,6 @@ services:
       retries: 10
       start_period: 15s
     restart: on-failure
-
-  event-service-db:
-    image: postgres:16.1
-    container_name: event-service-db
-    ports:
-      - "6552:5432"
-    environment:
-      - POSTGRES_DB=event-service
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=sa
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
 
   gateway-server:
     build: infra/gateway-server
@@ -203,34 +158,17 @@ services:
       start_period: 15s
     restart: on-failure
 
-  request-service-db:
-    image: postgres:16.1
-    container_name: request-service-db
-    ports:
-      - "6553:5432"
-    environment:
-      - POSTGRES_DB=request-service
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=sa
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
-
-  stats-server:
-    build: stats/stats-server
-    image: stats-server
-    container_name: stats-server
+  analyzer:
+    build: stats/analyzer
+    image: analyzer
+    container_name: analyzer
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-server-db:5432/stats-server
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://analyzer-server-db:5432/analyzer
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-      stats-server-db:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/stats-server" ]
@@ -240,20 +178,39 @@ services:
       start_period: 20s
     restart: on-failure
 
-  stats-server-db:
-    image: postgres:16.1
-    container_name: stats-server-db
-    ports:
-      - "6554:5432"
+  aggregator:
+    build: stats/aggregator
+    image: aggregator
+    container_name: aggregator
     environment:
-      - POSTGRES_DB=stats-server
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=sa
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
     healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/config-server" ]
+      interval: 15s
       timeout: 5s
-      interval: 5s
       retries: 10
+      start_period: 5s
+    restart: on-failure
+
+  collector:
+    build: stats/collector
+    image: collector
+    container_name: collector
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/config-server" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: on-failure
 
   user-service:
     build: core/user-service
@@ -277,6 +234,81 @@ services:
       start_period: 15s
     restart: on-failure
 
+  category-service-db:
+    image: postgres:16.1
+    container_name: category-service-db
+    ports:
+      - "6550:5432"
+    environment:
+      - POSTGRES_DB=category-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  compilation-service-db:
+    image: postgres:16.1
+    container_name: compilation-service-db
+    ports:
+      - "6551:5432"
+    environment:
+      - POSTGRES_DB=compilation-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  event-service-db:
+    image: postgres:16.1
+    container_name: event-service-db
+    ports:
+      - "6552:5432"
+    environment:
+      - POSTGRES_DB=event-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  request-service-db:
+    image: postgres:16.1
+    container_name: request-service-db
+    ports:
+      - "6553:5432"
+    environment:
+      - POSTGRES_DB=request-service
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  analyzer-server-db:
+    image: postgres:16.1
+    container_name: analyzer-server-db
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=analyzer
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
   user-service-db:
     image: postgres:16.1
     container_name: user-service-db
@@ -291,3 +323,35 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  kafka:
+    image: confluentinc/confluent-local:7.4.3
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092" # for client connections
+      - "9101:9101" # JMX
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      CLUSTER_ID: 'K0EA9p0yEe6MkAAAAkKsEg'
+
+  kafka-init-topics:
+    image: confluentinc/confluent-local:7.4.3
+    container_name: kafka-init-topics
+    depends_on:
+      - kafka
+    command: "bash -c \
+                'kafka-topics --create --topic stats.user-actions.v1 \
+                             --partitions 1 --replication-factor 1 --if-not-exists \
+                             --bootstrap-server kafka:29092 && \
+                kafka-topics --create --topic stats.events-similarity.v1 \
+                             --partitions 1 --replication-factor 1 --if-not-exists \
+                             --bootstrap-server kafka:29092'"
+    init: true

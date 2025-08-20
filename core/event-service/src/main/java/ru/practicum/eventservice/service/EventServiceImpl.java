@@ -2,11 +2,18 @@ package ru.practicum.eventservice.service;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import ewm.client.StatsClient;
+import ewm.client.AnalyzerClient;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ru.practicum.api.client.RequestServiceClient;
+import ru.practicum.api.dto.requestservice.RequestDto;
+import ru.practicum.api.dto.requestservice.RequestStatus;
+import ru.practicum.api.exception.RemoteServiceException;
+import ru.practicum.api.exception.eventservice.*;
 import ru.practicum.eventservice.model.Event;
 import ru.practicum.eventservice.model.EventSearch;
 import ru.practicum.eventservice.model.Location;
@@ -17,20 +24,16 @@ import ru.practicum.api.dto.categoryservice.CategoryDto;
 import ru.practicum.api.dto.eventservice.*;
 import ru.practicum.api.dto.userservice.UserDto;
 import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.api.exception.eventservice.EventEditingException;
-import ru.practicum.api.exception.eventservice.EventNotFoundException;
-import ru.practicum.api.exception.eventservice.InvalidEventDateException;
 import ru.practicum.api.exception.userservice.UserNotFoundException;
 import ru.practicum.api.client.CategoryServiceClient;
 import ru.practicum.api.client.UserServiceClient;
 import ru.practicum.api.pageable.PageOffset;
+import ru.practicum.grpc.stats.recommendation.RecommendedEventProto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -41,9 +44,12 @@ public class EventServiceImpl implements EventService {
 
     private final CategoryServiceClient categoryServiceClient;
 
-    private final StatsClient statsClient;
-
     private final UserServiceClient userServiceClient;
+
+    private final RequestServiceClient requestServiceClient;
+
+    private final AnalyzerClient analyzerClient;
+
 
     @Override
     public EventDto createEvent(Long initiatorId, CreateEventDto createEventDto) throws InvalidEventDateException {
@@ -64,7 +70,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventMapper.mapToEvent(createEventDto, initiator.getId(), category.getId());
         eventRepository.save(event);
 
-        return eventMapper.mapToEventDto(event, initiator, category, 0L);
+        return eventMapper.mapToEventDto(event, initiator, category);
     }
 
     @Override
@@ -104,7 +110,7 @@ public class EventServiceImpl implements EventService {
             throw new AccessToEventForbiddenException(eventId);
         }
 
-        return eventMapper.mapToEventDto(event, userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(event.getId()));
+        return eventMapper.mapToEventDto(event, userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -115,7 +121,7 @@ public class EventServiceImpl implements EventService {
             throw new EventNotFoundException(eventId);
         }
 
-        return eventMapper.mapToEventDto(event, userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(event.getId()));
+        return eventMapper.mapToEventDto(event, userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -184,7 +190,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(eventId));
+        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(event.getInitiatorId()), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -255,7 +261,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()), getEventStats(eventId));
+        return eventMapper.mapToEventDto(eventRepository.save(event), userServiceClient.getUser(initiatorId), categoryServiceClient.getCategory(event.getCategoryId()));
     }
 
     @Override
@@ -341,18 +347,72 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
-    private Long getEventStats(long eventId) {
-        LocalDateTime start = LocalDateTime.of(2020, 5, 5, 0, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2035, 5, 5, 0, 0, 0);
-
-        try {
-            return Objects.requireNonNull(statsClient.getStats(start, end, List.of("/events/" + eventId), true).getBody()).getFirst().getHits();
-        } catch (Throwable ex) {
-            return 0L;
+    @Override
+    public void checkUserRegistrationAtEvent(Long userId, Long eventId) throws EventNotFoundException, UserNotFoundException, UserNotVisitedEventException {
+        Event event = findEvent(eventId);
+        findUserDto(userId);
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new EventNotFoundException(eventId);
         }
+        if (event.isRequestModeration() || event.getParticipantLimit() != 0) {
+            if (event.getInitiatorId() != userId && requestServiceClient.findByRequesterIdAndEventId(userId, eventId)
+                    .filter(o -> o.getStatus() == RequestStatus.CONFIRMED).isEmpty()) {
+                throw new UserNotVisitedEventException("Пользователь с id=" + userId + " не посещал событие с id=" + event);
+            }
+        }
+    }
+
+    @Override
+    public List<EventDto> getRecommendationsForUser(Long userId, Integer maxResult) {
+        findUserDto(userId);
+        List<Long> eventIds = analyzerClient.getRecommendationsForUser(userId, maxResult)
+                .map(RecommendedEventProto::getEventId).toList();
+        List<Event> events = eventRepository.findByIdIn(eventIds);
+        Set<Long> initiatorIds = events.stream().map(Event::getInitiatorId).collect(Collectors.toSet());
+        Map<Long, UserDto> initiatorsMap = findUsers(initiatorIds.stream().toList()).stream()
+                .collect(Collectors.toMap(UserDto::getId, Function.identity()));
+        List<EventDto> eventsDto = new ArrayList<>(eventMapper.mapToEventDtoCollection(events));
+        loadStatisticAndRequestForList(eventsDto);
+        return eventsDto;
     }
 
     private Event findEvent(Long eventId) throws EventNotFoundException {
         return eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+    }
+
+    private UserDto findUserDto(Long userId) throws UserNotFoundException {
+        return userServiceClient.getUser(userId);
+    }
+
+    private List<UserDto> findUsers(List<Long> usersId) {
+        try {
+            return userServiceClient.getUsers(usersId).stream().toList();
+        } catch (FeignException ex) {
+            if (ex.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new UserNotFoundException(usersId.getFirst());
+            }
+            throw new RemoteServiceException("Error in the remote service 'user-service");
+        }
+    }
+
+    private List<EventDto> loadStatisticAndRequestForList(List<EventDto> events) {
+        if (events == null || events.isEmpty()) {
+            return List.of();
+        }
+
+        List<RequestDto> requests = requestServiceClient.findByEventIdInAndStatus(events.stream()
+                .map(EventDto::getId)
+                .toList(), RequestStatus.CONFIRMED);
+
+        Map<Long, Double> ratingsMap = analyzerClient.getInteractionsCount(events.stream().map(EventDto::getId).collect(Collectors.toList()));
+
+        return events.stream()
+                .peek(event -> event.setConfirmedRequests(
+                        (int) requests.stream()
+                                .filter(request -> request.getEvent().equals(event.getId()))
+                                .count()
+                ))
+                .peek(event -> event.setRating(ratingsMap.getOrDefault(event.getId(), 0.0)))
+                .toList();
     }
 }

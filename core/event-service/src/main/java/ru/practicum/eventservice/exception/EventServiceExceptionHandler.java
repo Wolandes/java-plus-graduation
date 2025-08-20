@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.api.exception.categoryservice.CategoryNotFoundException;
-import ru.practicum.api.exception.eventservice.AccessToEventForbiddenException;
-import ru.practicum.api.exception.eventservice.EventEditingException;
-import ru.practicum.api.exception.eventservice.EventNotFoundException;
-import ru.practicum.api.exception.eventservice.InvalidEventDateException;
+import ru.practicum.api.exception.eventservice.*;
 import ru.practicum.api.exception.userservice.UserNotFoundException;
 
 /**
@@ -80,5 +77,10 @@ public class EventServiceExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Exception> handleUserNotFoundException(final UserNotFoundException userNotFoundException) {
         return new ResponseEntity<>(userNotFoundException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Exception> handleUserNotVisitedEventException(final UserNotVisitedEventException userNotVisitedEventException) {
+        return new ResponseEntity<>(userNotVisitedEventException, HttpStatus.BAD_REQUEST);
     }
 }
