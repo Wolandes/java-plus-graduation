@@ -60,10 +60,12 @@ public class PublicEventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDto getPublishedEventById(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable(USER_ID_HEADER) @Positive Long eventId, HttpServletRequest request) throws EventNotFoundException {
+    public EventDto getPublishedEventById(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable @Positive Long eventId) throws EventNotFoundException {
         log.info("Get published event with id = {}", eventId);
         collectorClient.sendPreviewEvent(userId, eventId);
-        return eventService.getPublishedEventById(eventId);
+        EventDto eventDto = eventService.getPublishedEventById(eventId);
+        log.info("Создан Event");
+        return eventDto;
     }
 
     @PutMapping("/{eventId}/like")

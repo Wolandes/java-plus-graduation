@@ -10,18 +10,15 @@ import java.util.Set;
 
 public interface SimilarityRepository extends JpaRepository<Similarity, Long> {
     @Query("""
-            SELECT NEW Similarity(s.key, s.score, s.timestamp)
-            FROM Similarity s
-            WHERE s.key.eventId = :eventId
-               OR s.key.otherEventId = :eventId
+            select new Similarity(s.key, s.score, s.timestamp)
+            from Similarity s where s.key.eventId = :eventId or s.key.otherEventId = :eventId
             """)
     List<Similarity> findAllContainsEventId(long eventId);
 
     @Query("""
-            SELECT NEW Similarity(s.key, s.score, s.timestamp)
-            FROM Similarity s
-            WHERE s.key.eventId IN :eventId
-               OR s.key.otherEventId IN :eventId
+            select new Similarity(s.key, s.score, s.timestamp) from Similarity s
+            where s.key.eventId in :eventId or s.key.otherEventId in :eventId
+            order by s.score desc limit :maxResults
             """)
-    List<Similarity> findNPairContainsEventIdsSortedDescScore(Set<Long> eventId, Pageable pageable);
+    List<Similarity> findNPairContainsEventIdsSortedDescScore(Set<Long> eventId, int maxResults);
 }

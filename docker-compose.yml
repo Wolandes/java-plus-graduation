@@ -1,26 +1,4 @@
 services:
-  category-service:
-    build: core/category-service
-    image: category-service
-    container_name: category-service
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://category-service-db:5432/category-service
-    depends_on:
-      category-service-db:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/category-service" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    restart: on-failure
-
   category-service-db:
     image: postgres:16.1
     container_name: category-service-db
@@ -35,30 +13,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
-  compilation-service:
-    build: core/compilation-service
-    image: compilation-service
-    container_name: compilation-service
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://compilation-service-db:5432/compilation-service
-    depends_on:
-      compilation-service-db:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      event-service:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/compilation-service" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    restart: on-failure
 
   compilation-service-db:
     image: postgres:16.1
@@ -75,64 +29,6 @@ services:
       interval: 5s
       retries: 10
 
-  config-server:
-    build: infra/config-server
-    image: config-server
-    container_name: config-server
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/config-server" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-    restart: on-failure
-
-  discovery-server:
-    build: infra/discovery-server
-    image: discovery-server
-    container_name: discovery-server
-    ports:
-      - "8761:8761"
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://localhost:8761/actuator/health" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-
-  event-service:
-    build: core/event-service
-    image: event-service
-    container_name: event-service
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://event-service-db:5432/event-service
-    depends_on:
-      category-service:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      event-service-db:
-        condition: service_healthy
-      analyzer-server:
-        condition: service_healthy
-      user-service:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/event-service" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    restart: on-failure
-
   event-service-db:
     image: postgres:16.1
     container_name: event-service-db
@@ -147,61 +43,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
-  gateway-server:
-    build: infra/gateway-server
-    image: gateway-server
-    container_name: gateway-server
-    ports:
-      - "8080:8080"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      category-service:
-        condition: service_healthy
-      compilation-service:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      event-service:
-        condition: service_healthy
-      request-service:
-        condition: service_healthy
-      user-service:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/gateway-server" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-    restart: on-failure
-
-  request-service:
-    build: core/request-service
-    image: request-service
-    container_name: request-service
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://request-service-db:5432/request-service
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      event-service:
-        condition: service_healthy
-      request-service-db:
-        condition: service_healthy
-      user-service:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/request-service" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    restart: on-failure
 
   request-service-db:
     image: postgres:16.1
@@ -218,66 +59,6 @@ services:
       interval: 5s
       retries: 10
 
-  analyzer-server:
-    build: stats/analyzer
-    image: analyzer-server
-    container_name: analyzer-server
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://analyzer-server-db:5432/analyzer
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      analyzer-server-db:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    restart: on-failure
-
-  aggregator-server:
-    build: stats/aggregator
-    image: aggregator-server
-    container_name: aggregator-server
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    restart: on-failure
-
-  collector-server:
-    build: stats/collector
-    image: collector-server
-    container_name: collector-server
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/analyzer-server" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    restart: on-failure
-
   analyzer-server-db:
     image: postgres:16.1
     container_name: analyzer-server-db
@@ -292,28 +73,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
-  user-service:
-    build: core/user-service
-    image: user-service
-    container_name: user-service
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-service-db:5432/user-service
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      user-service-db:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "--silent", "http://discovery-server:8761/eureka/v2/apps/user-service" ]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    restart: on-failure
 
   user-service-db:
     image: postgres:16.1

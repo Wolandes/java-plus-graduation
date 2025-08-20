@@ -26,7 +26,6 @@ public class SimilarityService {
 
     @Transactional(readOnly = true)
     public List<Similarity> findNPairContainsEventIdsSortedDescScore(Set<Long> eventIds, int maxResults) {
-        Pageable pageable = PageRequest.of(0, maxResults, Sort.by(Sort.Direction.DESC, "timestamp"));
-        return repository.findNPairContainsEventIdsSortedDescScore(eventIds, pageable);
+        return repository.findNPairContainsEventIdsSortedDescScore(eventIds, maxResults);
     }
 }

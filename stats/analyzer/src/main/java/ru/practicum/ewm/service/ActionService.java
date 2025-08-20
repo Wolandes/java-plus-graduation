@@ -50,10 +50,8 @@ public class ActionService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Long> findAllByUserIdAndEventIdIn(long userId, Set<Long> eventIds, int maxResult) {
-        Pageable pageable = PageRequest.of(0, maxResult, Sort.by(Sort.Direction.DESC, "timestamp"));
-        List<Long> eventIdsPage = repository.findEventIdsByUserIdAndEventIdIn(userId, eventIds, pageable);
-        return new HashSet<>(eventIdsPage);
+    public Set<Long> findAllByUserIdAndEventIdIn(long userId, Set<Long> eventIds) {
+        return new HashSet<>(repository.findEventIdsByUserIdAndEventIdIn(userId, eventIds));
     }
 
     @Transactional(readOnly = true)

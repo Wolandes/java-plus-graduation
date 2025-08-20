@@ -30,7 +30,7 @@ public class AnalyzerService {
         Set<Long> otherIds = similarPair.stream().map(o -> o.getKey().getOtherEventId()).collect(Collectors.toSet());
         ids.addAll(otherIds);
 
-        Set<Long> userEventIds = actionService.findAllByUserIdAndEventIdIn(request.getUserId(), ids, request.getMaxResults());
+        Set<Long> userEventIds = actionService.findAllByUserIdAndEventIdIn(request.getUserId(), ids);
 
         similarPair.removeIf(o -> userEventIds.contains(o.getKey().getEventId()) && userEventIds.contains(o.getKey().getOtherEventId()));
 
